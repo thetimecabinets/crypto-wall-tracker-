@@ -1,0 +1,28 @@
+[
+  {
+    "type": "buy",
+    "exchange": "Binance",
+    "coin": "BTC",
+    "price": 60000,
+    "quantity": 2.5,
+    "value": 150000,
+    "distance": "-2.5%",
+    "age": "5 min ago",
+    "age_seconds": 300,
+    "volatility": "1.8%",
+    "volume": "25000000"
+  },
+  {
+    "type": "sell",
+    "exchange": "Binance",
+    "coin": "ETH",
+    "price": 3000,
+    "quantity": 10,
+    "value": 30000,
+    "distance": "+1.2%",
+    "age": "2 min ago",
+    "age_seconds": 120,
+    "volatility": "2.4%",
+    "volume": "8000000"
+  }
+]
