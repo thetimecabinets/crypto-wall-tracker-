@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🐋 Whale Wall Tracker - CryptoDensities.pro</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      padding: 40px;
+      color: #333;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+    }
+    .left-column {
+      flex: 2;
+      margin-right: 20px;
+    }
+    .right-column {
+      flex: 1;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      padding: 20px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    .filters {
+      margin-bottom: 15px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    select, button {
+      padding: 6px 10px;
+      font-size: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+    .buy {
+      color: green;
+      font-weight: bold;
+    }
+    .sell {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Left Side: Whale Wall Table -->
+    <div class="left-column">
+      <h1>🐋 Whale Wall Tracker</h1>
+      <p>Large limit order walls detected on major exchanges.</p>
+
+      <!-- Filters -->
+      <div class="filters">
+        <div class="filter-group">
+          <label for="exchangeFilter">Exchange:</label>
+          <select id="exchangeFilter">
+            <option value="">All</option>
+            <option value="Binance">Binance</option>
+            <option value="Bybit">Bybit</option>
+            <option value="Coinbase">Coinbase</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="coinFilter">Coin:</label>
+          <select id="coinFilter">
+            <option value="">All</option>
+            <option value="BTC">BTC</option>
+            <option value="ETH">ETH</option>
+            <option value="SOL">SOL</option>
+            <option value="BNB">BNB</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="typeFilter">Type:</label>
+          <select id="typeFilter">
+            <option value="">All</option>
+            <option value="buy">Buy</option>
+            <option value="sell">Sell</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="valueFilter">Value:</label>
+          <select id="valueFilter">
+            <option value="">All</option>
+            <option value="100000">> $100K</option>
+            <option value="250000">> $250K</option>
+            <option value="500000">> $500K</option>
+            <option value="1000000">> $1M</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="ageFilter">Age:</label>
+          <select id="ageFilter">
+            <option value="">All</option>
+            <option value="3600">< 1 hour</option>
+            <option value="21600">< 6 hours</option>
+            <option value="86400">< 24 hours</option>
+          </select>
+        </div>
+        <button onclick="resetFilters()">Reset</button>
+      </div>
+
+      <!-- Table -->
+      <table id="wallsTable">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Exchange</th>
+            <th>Coin</th>
+            <th>Price ($)</th>
+            <th>Quantity</th>
+            <th>Value ($)</th>
+            <th>Distance (%)</th>
+            <th>Age</th>
+            <th>Volatility (1h)</th>
+            <th>Volume (24h)</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Right Side: Ads / Promotions Placeholder -->
+    <div class="right-column">
+      <h2>Ads & Promotions</h2>
+      <p>This is where sponsored banners or affiliate links will go.</p>
+      <img src="https://via.placeholder.com/300x250?text=Your+Ad+Here" alt="Ad Placeholder" style="width: 100%; max-width: 300px;">
+    </div>
+
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    function filterTable() {
+      const exchangeFilter = document.getElementById("exchangeFilter").value.toLowerCase();
+      const coinFilter = document.getElementById("coinFilter").value.toUpperCase();
+      const typeFilter = document.getElementById("typeFilter").value;
+      const valueFilter = parseFloat(document.getElementById("valueFilter").value) || 0;
+      const ageFilter = parseFloat(document.getElementById("ageFilter").value) || Infinity;
+
+      const rows = document.querySelectorAll("#wallsTable tbody tr");
+
+      rows.forEach(row => {
+        const exchange = row.cells[1].textContent.trim().toLowerCase();
+        const coin = row.cells[2].textContent.trim().toUpperCase();
+        const type = row.cells[0].classList.contains("buy") ? "buy" : "sell";
+        const value = parseFloat(row.getAttribute("data-value")) || 0;
+        const age = parseFloat(row.getAttribute("data-age")) || 0;
+
+        const matchesExchange = !exchangeFilter || exchange === exchangeFilter;
+        const matchesCoin = !coinFilter || coin === coinFilter;
+        const matchesType = !typeFilter || type === typeFilter;
+        const matchesValue = !valueFilter || value >= valueFilter;
+        const matchesAge = !ageFilter || age <= ageFilter;
+
+        row.style.display = (matchesExchange && matchesCoin && matchesType && matchesValue && matchesAge) ? "" : "none";
+      });
+    }
+
+    function resetFilters() {
+      document.getElementById("exchangeFilter").value = "";
+      document.getElementById("coinFilter").value = "";
+      document.getElementById("typeFilter").value = "";
+      document.getElementById("valueFilter").value = "";
+      document.getElementById("ageFilter").value = "";
+      filterTable();
+    }
+
+    async function loadTableFromAPI() {
+      const res = await fetch('/api/orders');
+      const data = await res.json();
+      const tbody = document.querySelector('#wallsTable tbody');
+      tbody.innerHTML = '';
+
+      data.forEach(order => {
+        const row = document.createElement('tr');
+        row.setAttribute('data-value', order.value);
+        row.setAttribute('data-age', order.age_seconds);
+
+        row.innerHTML = `
+          <td class="${order.type === 'buy' ? 'buy' : 'sell'}">${order.type.charAt(0).toUpperCase() + order.type.slice(1)}</td>
+          <td>${order.exchange}</td>
+          <td>${order.coin}</td>
+          <td>${order.price}</td>
+          <td>${order.quantity}</td>
+          <td>$${order.value.toLocaleString()}</td>
+          <td>${order.distance}</td>
+          <td>${order.age}</td>
+          <td>${order.volatility}</td>
+          <td>$${order.volume}</td>
+        `;
+
+        tbody.appendChild(row);
+      });
+
+      filterTable();
+    }
+
+    window.onload = loadTableFromAPI;
+    document.getElementById("exchangeFilter").addEventListener("change", filterTable);
+    document.getElementById("coinFilter").addEventListener("change", filterTable);
+    document.getElementById("typeFilter").addEventListener("change", filterTable);
+    document.getElementById("valueFilter").addEventListener("change", filterTable);
+    document.getElementById("ageFilter").addEventListener("change", filterTable);
+  </script>
+
+</body>
+</html>
