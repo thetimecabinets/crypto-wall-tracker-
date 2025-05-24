@@ -1,10 +1,10 @@
 import requests
 import json
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 import random
 
-OUTPUT_FILE = 'orders.json'
+OUTPUT_FILE = 'backend/orders.json'
 
 def fetch_top_50_binance_symbols():
     url = 'https://api.binance.com/api/v3/ticker/24hr'
@@ -16,19 +16,17 @@ def fetch_top_50_binance_symbols():
 
 def generate_whale_orders(symbols):
     orders = []
-    now = datetime.utcnow()
     for symbol_data in symbols:
         symbol = symbol_data['symbol'].replace('USDT', '')
         price = float(symbol_data['lastPrice'])
         volume = float(symbol_data['quoteVolume'])
         volatility = abs(float(symbol_data['priceChangePercent']))
 
-        # Create fake whale orders
         for _ in range(random.randint(1, 3)):
             order_type = random.choice(['buy', 'sell'])
             quantity = round(random.uniform(10, 1000), 2)
             value = round(quantity * price, 2)
-            if value < 5000:  # Skip small orders
+            if value < 5000:
                 continue
 
             distance = f"{round(random.uniform(-3, 3), 2)}%"
@@ -56,14 +54,8 @@ def save_orders(data):
         json.dump(data, f, indent=2)
 
 def main():
-    print("Fetching symbols...")
     symbols = fetch_top_50_binance_symbols()
-    print(f"Found {len(symbols)} symbols")
-
-    print("Generating whale orders...")
     orders = generate_whale_orders(symbols)
-
-    print(f"Saving {len(orders)} orders to {OUTPUT_FILE}...")
     save_orders(orders)
 
 if __name__ == '__main__':
